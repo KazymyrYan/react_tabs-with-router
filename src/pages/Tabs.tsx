@@ -1,35 +1,44 @@
-import classNames from 'classnames';
 import { Link, useParams } from 'react-router-dom';
-import { Tab } from '../types/Tab';
 import React from 'react';
+import { Tabs, Tab, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+import { Tab as TabType } from '../types/Tab';
 
 type Props = {
-  tabs: Tab[];
+  tabs: TabType[];
 };
 
-export const Tabs: React.FC<Props> = ({ tabs }) => {
+export const TabsComponent: React.FC<Props> = ({ tabs }) => {
   const { tabId } = useParams();
-  const activeTab = tabs.find(tab => tab.id === tabId);
+  const selectedIndex = tabs.findIndex(tab => tab.id === tabId);
 
   return (
     <>
-      <div className="tabs is-boxed">
-        <ul>
+      <Tabs
+        selectedIndex={selectedIndex}
+        onSelect={() => {}}
+        selectedTabClassName="is-active"
+      >
+        <TabList>
           {tabs.map(tab => (
-            <li
-              key={tab.id}
-              data-cy="Tab"
-              className={classNames({ 'is-active': tab.id === tabId })}
-            >
+            <Tab key={tab.id} data-cy="Tab">
               <Link to={`/tabs/${tab.id}`}>{tab.title}</Link>
-            </li>
+            </Tab>
           ))}
-        </ul>
-      </div>
+        </TabList>
 
-      <div className="block" data-cy="TabContent">
-        {activeTab ? activeTab.content : 'Please select a tab'}
-      </div>
+        {tabs.map(tab => (
+          <TabPanel key={tab.id} data-cy="TabContent">
+            {tab.content}
+          </TabPanel>
+        ))}
+      </Tabs>
+
+      {selectedIndex === -1 && (
+        <div className="block" data-cy="TabContent">
+          Please select a tab
+        </div>
+      )}
     </>
   );
 };
